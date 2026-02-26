@@ -1,0 +1,49 @@
+<div id="user-posts"  class="comments">
+{% if comments %}
+    <div class="space-y-4">
+        {% for comment in comments %}
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative">
+                <div class="flex justify-between items-center mb-2">
+                    <!-- author (move this block ABOVE the title) -->
+                    <div class="flex items-center gap-2 mb-1">
+                        <a href="{% url 'users:profile' comment.author.profile.id %}" class="flex items-center gap-2">
+                            
+                            {% if comment.author.profile.avatar %}
+                                <img src="{{ comment.author.profile.avatar.url }}"
+                                    class="w-8 h-8 rounded-full object-cover border border-gray-200">
+                            {% else %}
+                                <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-xs">
+                                    ?
+                                </div>
+                            {% endif %}
+
+                            <span class="text-gray-700 text-sm font-medium hover:text-blue-600 transition">
+                                {{ comment.author.username }}
+                            </span>
+
+                        </a>
+                    </div>
+                    <!-- end author -->
+                    <span class="text-xs text-gray-400">{{ comment.time_created|date:"M d, Y H:i" }}</span>
+                </div>
+                <p class="text-gray-700">{{ comment.body }}</p>
+                {% include 'snippets/comments_likes.html' with comment=comment %}
+
+                {% if user == comment.author %}
+                    <form hx-post ="{% url 'delete_comment' comment.id %}"
+                        hx-target="closest .comments"
+                        class="absolute top-3 right-3">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white text-xs px-2 pt-1 mt-12 rounded-md transition">
+                            delete
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-gray-500">no comments yet. be the first to comment!</p>
+{% endif %}
+</div>
